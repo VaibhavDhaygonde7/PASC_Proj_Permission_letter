@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-from letter_functions import get_context, generating_prompt, generating_output
-from pdf_functions import create_pdf
+# from letter_functions import get_context, generating_prompt, generating_output
+from groq import generating_prompt, get_context, generate_letter
+from pdf_functions import create_pdf, delete_pdf
+
 app = Flask(__name__)
 
 
@@ -12,7 +14,7 @@ Output only the final polished letter.
 Also write the output in a letter's format. Use newlines and indentation whereever necessary"""
 
 variables = {
-    'head_in_charge': 'head_in_charge_here',
+    'head_in_charge_name': 'head_in_charge_here',
     'program_name': 'program_name_here',
     'room_no': 'room_no_here',
     'sender_name': 'sender_name_here',
@@ -23,21 +25,21 @@ template = get_context('Context_for_permission_letter.txt')
 
 @app.route('/')
 def home():
+    delete_pdf() #if any previous pdf exists
     return render_template('home.html')
 
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    global prompt_generated
-
-    head_in_charge = request.form['head_in_charge']
+    delete_pdf() ## if any previous pdf exists
+    head_in_charge = request.form['head_in_charge_name']
     program_name = request.form['program_name']
     room_no = request.form['room_no']
     sender_name = request.form['sender_name']
     date = request.form['date']
 
     ## updating the key-value pairs of "variables" 
-    variables['head_in_charge'] = head_in_charge
+    variables['head_in_charge_name'] = head_in_charge
     variables['program_name'] = program_name
     variables['room_no'] = room_no
     variables['sender_name'] = sender_name
@@ -49,8 +51,8 @@ def submit():
 @app.route('/result')
 def result():
     prompt = generating_prompt(template, variables, instructions)
-    
-    prompt_output = generating_output(prompt)
+    print(prompt)
+    prompt_output = generate_letter(variables)
 
     return render_template('result.html', prompt_output=prompt_output)
 
