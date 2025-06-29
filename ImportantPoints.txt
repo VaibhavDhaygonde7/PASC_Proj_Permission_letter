@@ -1,0 +1,3 @@
+1) tloen/alpaca-lora-7b was fine tuned on Meta's LLaMa 7B 
+This model cannot be used directly because Meta has restriced it's weights 
+2) So we will use Vicuna, Alpaca styled replica 

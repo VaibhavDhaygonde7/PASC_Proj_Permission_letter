@@ -1,0 +1,12 @@
+The following is a rough template for a permission letter. 
+
+[date]
+
+Dear [head_in_charge_name],
+
+I'm writting this letter for asking permission to conduct [program_name] in the class room [room_no]. 
+
+Thanking you!
+
+Your's truly,
+[sender_name]

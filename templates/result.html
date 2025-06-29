@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        
+        /* Body styling to mimic ChatGPT dark theme */
+        body {
+            background-color: #343541; /* ChatGPT background */
+            color: #ECECF1; /* ChatGPT text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+                
+        /* Container centers content with spacing */
+        .container {
+            background-color: #40414F; /* card-like background */
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* Editable output area styled like a chat bubble */
+        #prompt_output {
+            background-color: #343541; /* slightly darker than container */
+            color: #ECECF1;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            min-height: 200px;
+            width: 100%;
+            overflow-y: auto;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 1rem;
+        }
+
+        #prompt_output:focus {
+            outline: none;
+            border-color: #10A37F;
+            box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.4);
+        }
+
+        /* Download button styled with ChatGPT accent */
+        #download {
+            background-color: #10A37F;
+            color: #FFFFFF;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        #download:hover {
+            background-color: #0e8c6b;
+        }
+
+
+    </style>
+
+</head>
+<body>
+    <!-- <h1>This is the result</h1> -->
+
+
+    <div class="container">
+        <div id="prompt_output" contenteditable="true">
+    
+    
+        </div>
+        <button id="download">Download PDF</button>
+
+    </div>
+
+
+    <script>
+
+        const prompt_output = `{{ prompt_output | tojson | safe }}`
+        console.log(prompt_output)
+        const container = document.getElementById("prompt_output");
+        let index = 0;
+
+        function typeWriter() {
+            if (index < prompt_output.length) {
+                container.innerHTML += prompt_output.charAt(index);
+                index++;
+                setTimeout(typeWriter, 20); // 20ms delay for typing
+            }
+        }
+
+        typeWriter();
+
+        let download_btn = document.getElementById("download")
+        
+        download_btn.addEventListener("click", ()=>{
+
+            const permission_letter = document.getElementById("prompt_output").innerText;
+
+            console.log(permission_letter);
+
+            fetch("/api/download_pdf", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                letter_str: permission_letter
+                })
+            })
+            .then(res => res.text())
+            .then(data => {
+                // console.log(data);
+                window.location.href = "/download_pdf";
+            });
+        })
+
+    </script>
+</body>
+</html>
